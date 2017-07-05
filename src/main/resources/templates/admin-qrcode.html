@@ -1,0 +1,98 @@
+<#include "admin-header.html" />
+
+<div class="admin-content-body">
+    <div class="am-cf am-padding am-padding-bottom-0">
+        <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">群发二维码</strong></div>
+    </div>
+
+    <hr/>
+
+    <div class="am-g">
+        <div class="am-u-sm-12 qrGen">
+            <div class="am-panel am-panel-default">
+                <select id="wxConfig" data-am-selected="{btnWidth: '100%'}">
+                    <#list user.wxConfigs as item>
+                        <option value="${item.id}">配置${item_index?if_exists+1}</option>
+                    </#list>
+                </select>
+            </div>
+        </div>
+        <div class="am-u-sm-12">
+            <div class="am-panel am-panel-default">
+                <div class="am-panel-bd">
+                    <div class="am-g">
+                        <div id="qrcode" class="am-u-md-12">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="am-u-sm-12 qrGen">
+            <div class="am-panel am-panel-default">
+                <div class="am-panel-bd">
+                    <div class="am-g">
+                        <div class="am-u-md-12">
+                            <input type="button" id="qrGen" class="am-btn am-btn-primary am-btn-xs" value="生成二维码">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<#include "admin-footer.html" />
+<script>
+    $(function () {
+        var id = 0;
+        function reset() {
+            id = 0;
+            $('#qrcode').empty();
+            $('.qrGen').show();
+        }
+
+        reset();
+
+        function qrGen() {
+            $('#qrcode').append('<img class="am-img-circle am-img-thumbnail" src="/assets/i/loading.gif" />');
+            $.get('/api/qr', function (data) {
+                $('#qrcode').empty();
+                $('#qrcode').append('<img class="am-img-circle am-img-thumbnail" src="data:image/png;base64,' + data.qr + '"/><div id="countdown"><span>120</span>秒后失效</div>');
+                id = data.id;
+            });
+        }
+
+        function contact() {
+            if (!id)return;
+            console.log($('#wxConfig').val())
+            $.get('/api/contact/' + id + '/' + $('#wxConfig').val(), function () {
+            });
+            reset();
+        }
+
+        setInterval(function () {
+            if (!id)return;
+            $.get('/api/state/' + id, function (data) {
+                if (data === "block") contact();
+            })
+        }, 2000);
+
+        setInterval(function () {
+            if (!id)return;
+            var time = parseInt($('#countdown>span').text());
+            if (time < 1) {
+                reset();
+            } else {
+                $('#countdown>span').text(time - 1);
+            }
+
+        }, 1000);
+
+        $('#qrGen').click(function () {
+            qrGen();
+            $('.qrGen').hide();
+        });
+    });
+
+</script>

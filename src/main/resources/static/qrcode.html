@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微信二维码</title>
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="http://apps.bdimg.com/libs/lodash/3.5.0/lodash.min.js"></script>
+</head>
+<body>
+<div id="qrcode">
+    <img src="/api/qr" alt="二维码" />
+</div>
+<script>
+    window.scanned=false;
+    function contact(){
+        console.log("contact")
+        $.get('/api/contact',function(){});
+        setTimeout(function(){window.close()},1000)
+    }
+    var contactOnce=_.once(contact);
+    setInterval(function(){
+        $.get('/api/state',function(data){
+            window.scanned=data==="block"
+        })
+    },2000);
+
+    setInterval(function(){
+        if(window.scanned){
+            contactOnce();
+        }
+
+    },200)
+</script>
+</body>
+</html>

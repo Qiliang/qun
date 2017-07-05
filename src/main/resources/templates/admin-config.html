@@ -1,0 +1,54 @@
+<#include "admin-header.html" />
+
+<div class="admin-content-body">
+    <div class="am-cf am-padding am-padding-bottom-0">
+        <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">内容配置</strong> /
+            <small>Configuration</small>
+        </div>
+    </div>
+
+    <hr/>
+
+
+    <#list user.wxConfigs as item>
+
+
+        <div class="am-g">
+            <div class="am-u-sm-12">
+                <div class="am-panel am-panel-default">
+                    <div class="am-panel-bd">
+                        <div class="am-g">
+                            <div class="am-u-md-12">
+                                <h2>配置${item_index?if_exists+1}</h2>
+                                <#if item.image??>
+                                    <img class="am-img-circle am-img-thumbnail"
+                                         src="data:image/png;base64,${item.image}" alt=""/>
+                                </#if>
+                            </div>
+                            <div class="am-u-md-12">
+
+                                <form class="am-form" method="post" enctype="multipart/form-data">
+                                    <div class="am-form-group">
+                                        <input type="file" name="img" id="user-pic1">
+                                        <p class="am-form-help">请选择要上传的图片...</p>
+                                        <div class="am-form-group">
+                                            <div class="am-u-sm-9">
+                                                <textarea class="" name="txt" rows="5" id="user-intro"><#if item.text??>${item.text}</#if></textarea>
+                                                <small>250字以内写出你要发送的文字...</small>
+                                            </div>
+                                        </div>
+                                        <input type="submit" class="am-btn am-btn-primary am-btn-xs" value="保存">
+                                        <input type="hidden" name="wxConfigId" value="${item.id}"/>
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </#list>
+</div>
+
+<#include "admin-footer.html" />
