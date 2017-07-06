@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <#include "header.html" />
+</head>
+
+<body ontouchstart>
+  <div class="title">账号设置</div>
+  <form method="post" action="/accountSet">
+  <div class="weui-cells margintop">
+    <input type="hidden" name="id" value="${(user.id)!}"/>
+    <div class="weui-cell">
+      <div class="weui-cell__hd"><label class="weui-label">显示姓名</label></div>
+      <div class="weui-cell__bd">
+        <input class="weui-input" name="displayName" type="text" value="${(user.displayName)!}" placeholder="输入显示姓名">
+      </div>
+    </div>
+    <div class="weui-cell">
+      <div class="weui-cell__hd"><label class="weui-label">登录账号</label></div>
+      <div class="weui-cell__bd">
+        <input class="weui-input" type="text" name="username" value="${(user.username)!}" placeholder="输入登录账号">
+        user
+    </div>
+    <div class="weui-cell">
+      <div class="weui-cell__hd"><label class="weui-label">登录密码</label></div>
+      <div class="weui-cell__bd">
+        <input class="weui-input" type="password" name="password" value="${(user.password)!}" placeholder="输入登录密码">
+      </div>
+    </div>
+    <div class="weui-cell">
+      <div class="weui-cell__hd"><label class="weui-label">联系电话</label></div>
+      <div class="weui-cell__bd">
+        <input class="weui-input" type="number" name="tel" value="${(user.tel)!}" pattern="[0-9]*" placeholder="请输入联系电话">
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class='demos-content-padded'>
+      <input type="submit" value="保存" class="weui-btn weui-btn_primary"/>
+  </div>
+  </form>
+
+  <div class='demos-content-padded' >
+    <a href="/"  style="background-color:#586c94" class="weui-btn weui-btn_primary">返回首页</a>
+  </div>
+  <#include "footer.html" />
+
+</body>
+
+</html>

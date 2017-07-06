@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <#include "header.html" />
+</head>
+
+<body ontouchstart>
+  <div class="title">选择要群发的消息</div>
+  <div class="weui-cells margintop">
+    <div class="weui-cell weui-cell_select weui-cell_select-after">
+      <div class="weui-cell__hd">
+        <label class="weui-label">群发消息</label>
+      </div>
+      <div class="weui-cell__bd qrGen">
+
+        <select class="weui-select" name="select2" id="massType">
+            <#list massList as massSet>
+              <option value="${massSet.id}">${massSet.title}</option>
+            </#list>
+            </select>
+      </div>
+    </div>
+  </div>
+
+
+  <div class='demos-content-padded qrGen'>
+       <a id="qrGen" href="javascript:;" class="weui-btn weui-btn_primary">点击生成群发二维码</a>
+  </div>
+  <div id="qrcode" class='demos-content-padded'>
+
+  </div>
+  <#include "footer.html" />
+  <script>
+      $(function () {
+          var id = 0;
+          function reset() {
+              id = 0;
+              $('#qrcode').empty();
+              $('.qrGen').show();
+          }
+
+          reset();
+
+          function qrGen() {
+              $('#qrcode').append('<img class="am-img-circle am-img-thumbnail" src="/assets/i/loading.gif" />');
+              $.get('/api/qr', function (data) {
+                  $('#qrcode').empty();
+                  $('#qrcode').append('<img src="data:image/png;base64,' + data.qr + '"/><div id="countdown"><span>120</span>秒后失效</div>');
+                  id = data.id;
+              });
+          }
+
+          function contact() {
+              if (!id)return;
+              $.get('/api/contact/' + id + '/' + $('#massType').val(), function () {
+              });
+              reset();
+          }
+
+          setInterval(function () {
+              if (!id)return;
+              $.get('/api/state/' + id, function (data) {
+                  if (data === "block") contact();
+              })
+          }, 2000);
+
+          setInterval(function () {
+              if (!id)return;
+              var time = parseInt($('#countdown>span').text());
+              if (time < 1) {
+                  reset();
+              } else {
+                  $('#countdown>span').text(time - 1);
+              }
+
+          }, 1000);
+
+          $('#qrGen').click(function () {
+              qrGen();
+              $('.qrGen').hide();
+          });
+      });
+
+  </script>
+</body>
+
+</html>

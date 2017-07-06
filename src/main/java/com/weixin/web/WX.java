@@ -1,11 +1,9 @@
 package com.weixin.web;
 
-import com.weixin.domain.User;
+import com.weixin.domain.MassConfig;
+import com.weixin.domain.MassConfigRepository;
 import com.weixin.domain.UserRepository;
-import com.weixin.domain.WxConfig;
-import com.weixin.domain.WxConfigRepository;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
@@ -15,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +27,6 @@ import java.util.*;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static com.weixin.web.ImgaeUtils.crop;
@@ -44,7 +42,7 @@ public class WX implements InitializingBean {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    WxConfigRepository wxConfigRepository;
+    MassConfigRepository wxConfigRepository;
 
 
     private Map<String, PhantomJSDriver> drivers = new ConcurrentHashMap<>();
@@ -117,7 +115,7 @@ public class WX implements InitializingBean {
 
     @RequestMapping("/contact/{id}")
     @ResponseBody
-    public String contact2(@PathVariable String id, @RequestBody WxConfig wxConfig, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public String contact2(@PathVariable String id, @RequestBody MassConfig wxConfig, HttpServletRequest request, HttpServletResponse response) throws IOException {
         PhantomJSDriver webDriver = drivers.get(id);
         executorService.execute(() -> contract(webDriver, wxConfig));
         return "accept";
@@ -127,12 +125,12 @@ public class WX implements InitializingBean {
     @ResponseBody
     public String contact(@PathVariable String id, @PathVariable Integer wxConfigId, HttpServletRequest request, HttpServletResponse response) throws IOException {
         PhantomJSDriver webDriver = drivers.get(id);
-        final WxConfig wxConfig = wxConfigRepository.findOne(wxConfigId);
+        final MassConfig wxConfig = wxConfigRepository.findOne(wxConfigId);
         executorService.execute(() -> contract(webDriver, wxConfig));
         return "accept";
     }
 
-    private void contract(PhantomJSDriver webDriver, WxConfig wxConfig) {
+    private void contract(PhantomJSDriver webDriver, MassConfig wxConfig) {
         try {
             int scrollLength = 200;
             webDriver.findElementByCssSelector("i.web_wechat_tab_friends").click();
@@ -162,6 +160,7 @@ public class WX implements InitializingBean {
             chat(webDriver, wxConfig);
 
         } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             webDriver.quit();
         }
@@ -176,11 +175,19 @@ public class WX implements InitializingBean {
         }
     }
 
-    private void chat(PhantomJSDriver webDriver, final WxConfig wxConfig) {
+    private void chat(PhantomJSDriver webDriver, final MassConfig wxConfig) {
 
-        File imgFile = new File(UUID.randomUUID().toString().replaceAll("-","") + ".jpg");
+        List<File> imgFiles = new ArrayList<>();
         try {
-            FileUtils.writeByteArrayToFile(imgFile, Base64.getDecoder().decode(wxConfig.getImage()));
+            if(!StringUtils.isEmpty(wxConfig.getImage())) {
+                String[] images = wxConfig.getImage().split("\t");
+                for (String img : images) {
+                    if (StringUtils.isEmpty(img.trim())) continue;
+                    File imgFile = new File(UUID.randomUUID().toString().replaceAll("-", "") + ".jpg");
+                    FileUtils.writeByteArrayToFile(imgFile, Base64.getDecoder().decode(images[0]));
+                    imgFiles.add(imgFile);
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -213,15 +220,19 @@ public class WX implements InitializingBean {
 
                     if (test) {
                         if (e.getText().equals("文件传输助手") || e.getText().equals("File Transfer")) {
-                            webDriver.executePhantomJS("var page = this;page.uploadFile('input[type=file]','" + imgFile.getAbsolutePath().replaceAll("\\\\", "\\\\\\\\\\\\\\\\") + "');");
-                            findStaleElementByCssSelector(webDriver, "a.btn.btn_send").click();
+                            for (File imgFile : imgFiles) {
+                                webDriver.executePhantomJS("var page = this;page.uploadFile('input[type=file]','" + imgFile.getAbsolutePath().replaceAll("\\\\", "\\\\\\\\\\\\\\\\") + "');");
+                                findStaleElementByCssSelector(webDriver, "a.btn.btn_send").click();
+                            }
                             findStaleElementByCssSelector(webDriver, "#editArea").click();
                             findStaleElementByCssSelector(webDriver, "#editArea").sendKeys(wxConfig.getText());
                             findStaleElementByCssSelector(webDriver, "a.btn.btn_send").click();
                         }
                     } else {
-                        webDriver.executePhantomJS("var page = this;page.uploadFile('input[type=file]','" + imgFile.getAbsolutePath().replaceAll("\\\\", "\\\\\\\\\\\\\\\\") + "');");
-                        findStaleElementByCssSelector(webDriver, "a.btn.btn_send").click();
+                        for (File imgFile : imgFiles) {
+                            webDriver.executePhantomJS("var page = this;page.uploadFile('input[type=file]','" + imgFile.getAbsolutePath().replaceAll("\\\\", "\\\\\\\\\\\\\\\\") + "');");
+                            findStaleElementByCssSelector(webDriver, "a.btn.btn_send").click();
+                        }
                         findStaleElementByCssSelector(webDriver, "#editArea").click();
                         findStaleElementByCssSelector(webDriver, "#editArea").sendKeys(wxConfig.getText());
                         findStaleElementByCssSelector(webDriver, "a.btn.btn_send").click();

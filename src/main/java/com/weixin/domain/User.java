@@ -1,26 +1,33 @@
 package com.weixin.domain;
 
 import javax.persistence.*;
-import java.util.List;
 
 
 @Entity
 public class User {
 
     public enum ROLE{
-        admin, user;
+        ADMIN, USER, PROXY, EMPLOYEE;
     }
 
     @Enumerated(EnumType.STRING)
     private ROLE role;
 
     @Id
+    @GeneratedValue
+    private Integer id;
+
     private String username;
+
+    private String displayName;
+
+    private String tel;
 
     private String password;
 
-    @Transient
-    private List<WxConfig> wxConfigs;
+    private String employer;
+
+    private String parent;
 
     public String getUsername() {
         return username;
@@ -41,11 +48,43 @@ public class User {
         this.role = role;
     }
 
-    public List<WxConfig> getWxConfigs() {
-        return wxConfigs;
+    public String getEmployer() {
+        return employer;
     }
 
-    public void setWxConfigs(List<WxConfig> wxConfigs) {
-        this.wxConfigs = wxConfigs;
+    public void setEmployer(String employer) {
+        this.employer = employer;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public void setParent(String parent) {
+        this.parent = parent;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getTel() {
+        return tel;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

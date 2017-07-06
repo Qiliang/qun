@@ -2,8 +2,10 @@ package com.weixin.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, String> {
+import java.util.List;
+
+public interface UserRepository extends JpaRepository<User, Integer> {
 
     User findByUsername(String username);
-
+    List<User> findByEmployer(String employer);
 }

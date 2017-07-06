@@ -1,0 +1,99 @@
+body, html {
+  height: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header {
+  padding: 35px 0;
+  background: #696F77;
+}
+
+body {
+  background-color: #EFEFF4;
+}
+
+.header-title {
+  text-align: center;
+  font-size: 34px;
+  color: #3cc51f;
+  font-weight: 400;
+  margin: 0 15%;
+}
+
+.header-userAvatar {
+  width: 100px;
+  height: 100px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 10px auto;
+}
+
+.header-userAvatar img {
+  width: 100%;
+}
+
+.header-userName {
+  text-align: center;
+  color: #fff;
+  width: 100px;
+  margin: 10px auto;
+}
+
+.title {
+  font-size: 14px;
+  color: #888888;
+  padding: 10px 15px;
+}
+
+.gridsBackground {
+  background-color: #fff;
+}
+
+.bottom {
+  position: fixed;
+  bottom: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.weui-footer__link {
+  font-size: 12px;
+}
+
+.margintop {
+  margin-top: 0;
+}
+
+.demos-sub-title {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+.demos-content-padded {
+  padding: 15px;
+}
+
+.demos-second-title {
+  text-align: center;
+  font-size: 24px;
+  color: #3cc51f;
+  font-weight: 400;
+  margin: 0 15%;
+}
+.logintitle{text-align: center; font-size: 18px;padding-top: 50px;padding-bottom: 50px;}
+
+footer {
+  text-align: center;
+  font-size: 14px;
+  padding: 20px;
+}
+
+footer a {
+  color: #999;
+  text-decoration: none;
+}

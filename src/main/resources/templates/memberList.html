@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <#include "header.html" />
+</head>
+
+<body ontouchstart>
+  <div class="title">员工账号列表</div>
+  <div class="weui-cells margintop">
+    <#list employees as employee>
+      <a class="weui-cell weui-cell_access" href="/memberAdd/${employee.id}">
+        <div class="weui-cell__bd">
+          <p>${employee.displayName}</p>
+        </div>
+        <div class="weui-cell__ft">
+        </div>
+      </a>
+    </#list>
+  </div>
+  <div class='demos-content-padded'>
+    <a href="/memberAdd" class="weui-btn weui-btn_primary">新增员工账号</a></div>
+
+  <#include "footer.html" />
+
+</body>
+
+</html>

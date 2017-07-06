@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <#include "header.html" />
+</head>
+
+<body ontouchstart>
+<div class="title">员工账号信息</div>
+<form method="post" action="/memberAdd">
+    <div class="weui-cells margintop">
+        <input type="hidden" name="id" value="${(employee.id)!}"/>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">员工姓名</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" name="displayName" type="text" value="${(employee.displayName)!}" placeholder="输入员工姓名">
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">登录账号</label></div>
+            <div class="weui-cell__bd">
+                <#if message??><span style="color:orangered">${message}</span></#if>
+                <input class="weui-input" type="text" name="username" value="${(employee.username)!}" placeholder="输入登录账号">
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">登录密码</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="password" name="password" value="${(employee.password)!}" placeholder="输入登录密码">
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">联系电话</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="number" name="tel" value="${(employee.tel)!}" pattern="[0-9]*" placeholder="请输入员工手机号码">
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class='demos-content-padded'>
+        <input type="submit" value="保存" class="weui-btn weui-btn_primary"/>
+    </div>
+</form>
+<#include "footer.html" />
+
+</body>
+
+</html>

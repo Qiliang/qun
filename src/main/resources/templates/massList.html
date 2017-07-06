@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <#include "header.html" />
+</head>
+
+<body ontouchstart>
+  <div class="title">群发信息列表</div>
+  <div class="weui-cells margintop">
+    <#list massList as massSet>
+      <a class="weui-cell weui-cell_access" href="/massSet/${massSet.id}">
+        <div class="weui-cell__bd">
+          <p>${massSet.title}</p>
+        </div>
+        <div class="weui-cell__ft">
+        </div>
+      </a>
+    </#list>
+    <!--<a class="weui-cell weui-cell_access" href="massSet.html">-->
+      <!--<div class="weui-cell__bd">-->
+        <!--<p>群发消息一</p>-->
+      <!--</div>-->
+      <!--<div class="weui-cell__ft">-->
+      <!--</div>-->
+    <!--</a>-->
+    <!--<a class="weui-cell weui-cell_access" href="javascript:;">-->
+      <!--<div class="weui-cell__bd">-->
+        <!--<p>群发消息二</p>-->
+      <!--</div>-->
+      <!--<div class="weui-cell__ft">-->
+      <!--</div>-->
+    <!--</a>-->
+  </div>
+  <div class='demos-content-padded'>
+    <a href="/massSet" class="weui-btn weui-btn_primary">新增群发信息</a></div>
+  <#include "footer.html" />
+
+</body>
+
+</html>
