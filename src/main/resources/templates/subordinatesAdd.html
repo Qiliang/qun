@@ -7,37 +7,42 @@
 
 <body ontouchstart>
   <div class="title">下属账号信息</div>
+  <form method="post" action="/subordinatesAdd">
   <div class="weui-cells margintop">
+    <input type="hidden" name="id" value="${(proxy.id)!}"/>
     <div class="weui-cell">
-      <div class="weui-cell__hd"><label class="weui-label">账号联系人</label></div>
+      <div class="weui-cell__hd"><label class="weui-label">姓名</label></div>
       <div class="weui-cell__bd">
-        <input class="weui-input" type="text" pattern="[0-9]*" placeholder="请输入账号联系人姓名" >
+        <input class="weui-input" name="displayName" type="text" value="${(proxy.displayName)!}" placeholder="输入员工姓名">
       </div>
     </div>
     <div class="weui-cell">
       <div class="weui-cell__hd"><label class="weui-label">登录账号</label></div>
       <div class="weui-cell__bd">
-        <input class="weui-input" type="number" pattern="[0-9]*" placeholder="请输入登录账号" >
+        <#if message??><span style="color:orangered">${message}</span></#if>
+        <input class="weui-input" type="text" name="username" value="${(proxy.username)!}" placeholder="输入登录账号">
       </div>
     </div>
     <div class="weui-cell">
       <div class="weui-cell__hd"><label class="weui-label">登录密码</label></div>
       <div class="weui-cell__bd">
-        <input class="weui-input" type="password" pattern="[0-9]*" placeholder="请输入登录密码" >
+        <input class="weui-input" type="password" name="password" value="${(proxy.password)!}" placeholder="输入登录密码">
       </div>
     </div>
     <div class="weui-cell">
       <div class="weui-cell__hd"><label class="weui-label">联系电话</label></div>
       <div class="weui-cell__bd">
-        <input class="weui-input" type="number" pattern="[0-9]*" placeholder="请输入账号联系人的手机号码" >
+        <input class="weui-input" type="number" name="tel" value="${(proxy.tel)!}" pattern="[0-9]*" placeholder="请输入手机号码">
       </div>
     </div>
   </div>
   <div class="title" style="font-size:13px;">注意：此处申请的账号均为未激活状态，激活账号请联系平台方</div>
+  <#if !(proxy.id)??>
   <div class='demos-content-padded'>
-       <a href="javascript:;" class="weui-btn weui-btn_primary">立即申请</a>
+      <input type="submit" value="立即申请" class="weui-btn weui-btn_primary"/>
   </div>
-
+  </#if>
+  </form>
   <#include "footer.html" />
 
 </body>

@@ -29,8 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.weixin.web.ImgaeUtils.crop;
-
 @Controller
 @RequestMapping("/api")
 public class WX implements InitializingBean {
@@ -82,18 +80,41 @@ public class WX implements InitializingBean {
         drivers.put(id, webDriver);
         webDriver.manage().window().setSize(new Dimension(1900, 937));
         webDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        webDriver.get("https://wx.qq.com/");
-        System.out.println(webDriver.getTitle());
+        //webDriver.manage().timeouts().pageLoadTimeout(5, TimeUnit.SECONDS);
+        executorService.execute(() -> {
+            webDriver.get("https://wx.qq.com/");
+            System.out.println(webDriver.getTitle());
+        });
+
+//
+//        webDriver.get("https://wx.qq.com/");
+//        System.out.println(webDriver.getTitle());
 
         Map<String, Object> result = new HashMap<>();
 
-        sleep(1000);
-        //WebElement qrImg = webDriver.findElement(By.cssSelector("div.qrcode>img.img"));
+        String qrSrc = "/assets/i/face/output_1499406067.jpg";
+        long time = 0;
+        while (time < 1000 * 20) {
+            try {
+                WebElement qrImg = webDriver.findElement(By.cssSelector("div.qrcode>img.img"));
+                if (qrImg.getAttribute("src").startsWith("https://login.weixin.qq.com/qrcode/")) {
+                    qrSrc = qrImg.getAttribute("src");
+                    break;
+                }
+            } catch (Exception e) {
+
+            }
+            System.out.println(time);
+            time += 200;
+            sleep(200);
+        }
+         //WebElement qrImg = webDriver.findElement(By.cssSelector("div.qrcode>img.img"));
         //byte[] imgqqr = qrImg.getScreenshotAs(OutputType.BYTES);
-        byte[] img = webDriver.getScreenshotAs(OutputType.BYTES);
-        byte[] c = crop(img, 832, 256, 240, 240, true);
+//        sleep(5000);
+//        WebElement qrImg = webDriver.findElement(By.cssSelector("div.qrcode>img.img"));
+//        String qrSrc = qrImg.getAttribute("src");
         result.put("id", id);
-        result.put("qr", Base64.getEncoder().encodeToString(c));
+        result.put("qr", qrSrc);
         return result;
 //        byte[] img = qrImg.getScreenshotAs(OutputType.BYTES);
         //response.getOutputStream().write(img);
@@ -132,6 +153,7 @@ public class WX implements InitializingBean {
 
     private void contract(PhantomJSDriver webDriver, MassConfig wxConfig) {
         try {
+            sleep(2000);
             int scrollLength = 200;
             webDriver.findElementByCssSelector("i.web_wechat_tab_friends").click();
             Long totalHeight = (Long) webDriver.executeScript("return $('div.J_ContactScrollBody.scrollbar-dynamic.contact_list.ng-isolate-scope.scroll-content.scroll-scrolly_visible>div').height()");
@@ -139,6 +161,7 @@ public class WX implements InitializingBean {
             if (totalHeight != null) scrollCount = totalHeight / scrollLength + 1;
             final Set<String> friends = new HashSet<>();
             for (int i = 0; i < scrollCount; i++) {
+                sleep(100);
                 webDriver.executeScript("$('div.J_ContactScrollBody.scrollbar-dynamic.contact_list.ng-isolate-scope.scroll-content.scroll-scrolly_visible').scrollTop(" + scrollLength * i + ")");
                 List<WebElement> contacts = webDriver.findElementsByCssSelector("div.contact_item");
                 int toIndex;
@@ -148,13 +171,17 @@ public class WX implements InitializingBean {
                     toIndex = contacts.size() > 5 ? 5 : contacts.size();
                 contacts = webDriver.findElementsByCssSelector("div.contact_item");
                 contacts.subList(0, toIndex).forEach(e -> {
-                    String username = e.getText();
-                    if (friends.contains(username)) return;
-                    friends.add(username);
-                    e.click();
-                    findStaleElementByCssSelector(webDriver, "div.action_area>a.button").click();
-                    findStaleElementByCssSelector(webDriver, "i.web_wechat_tab_friends").click();
-                    System.out.println(e.getText());
+                    try {
+                        String username = e.getText();
+                        if (friends.contains(username)) return;
+                        friends.add(username);
+                        e.click();
+                        findStaleElementByCssSelector(webDriver, "div.action_area>a.button").click();
+                        findStaleElementByCssSelector(webDriver, "i.web_wechat_tab_friends").click();
+                        System.out.println(e.getText());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 });
             }
             chat(webDriver, wxConfig);
@@ -162,6 +189,7 @@ public class WX implements InitializingBean {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            logout(webDriver);
             webDriver.quit();
         }
     }
@@ -208,11 +236,12 @@ public class WX implements InitializingBean {
             else
                 toIndex = chats.size() > 5 ? 5 : chats.size();
             chats.subList(0, toIndex).forEach(e -> {
-
+                try {
                 String username = e.getAttribute("data-username");
                 if (chatnames.contains(username)) return;
                 chatnames.add(username);
-                try {
+                    if (username.startsWith("@@")) return;
+
                     System.out.println(e.getText());
                     e.click();
                     webDriver.executeScript("$('input[type=file]').removeClass('webuploader-element-invisible')");
@@ -243,6 +272,16 @@ public class WX implements InitializingBean {
 
             });
         }
+    }
+
+    private void logout(PhantomJSDriver webDriver) {
+        try {
+            webDriver.executeScript("$('.web_wechat_add').click()");
+            sleep(500);
+            webDriver.executeScript("$('#mmpop_system_menu li:last>a').click()");
+        } catch (Exception e) {
+        }
+
     }
 
     @Scheduled(fixedRate = 5000) //通过@Scheduled声明该方法是计划任务，使用fixedRate属性每隔固定时间执行

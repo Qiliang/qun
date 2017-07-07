@@ -27,7 +27,8 @@
   <div class='demos-content-padded qrGen'>
        <a id="qrGen" href="javascript:;" class="weui-btn weui-btn_primary">点击生成群发二维码</a>
   </div>
-  <div id="qrcode" class='demos-content-padded'>
+
+  <div id="qrcode" class='weui-cells'>
 
   </div>
   <#include "footer.html" />
@@ -46,7 +47,7 @@
               $('#qrcode').append('<img class="am-img-circle am-img-thumbnail" src="/assets/i/loading.gif" />');
               $.get('/api/qr', function (data) {
                   $('#qrcode').empty();
-                  $('#qrcode').append('<img src="data:image/png;base64,' + data.qr + '"/><div id="countdown"><span>120</span>秒后失效</div>');
+                  $('#qrcode').append('<div class="weui-cell"><img width="300" height="300" src="' + data.qr + '"/></div><div class="weui-cell" id="countdown"><span>120</span>秒后失效</div>');
                   id = data.id;
               });
           }

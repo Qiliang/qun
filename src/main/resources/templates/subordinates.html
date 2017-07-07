@@ -8,23 +8,18 @@
 <body ontouchstart>
   <div class="title">下属账号列表</div>
   <div class="weui-cells margintop">
-    <a class="weui-cell weui-cell_access" href="subordinatesInfo.html">
-      <div class="weui-cell__bd">
-        <p>胡駿</p>
-      </div>
-      <div class="weui-cell__ft">
-      </div>
-    </a>
-    <a class="weui-cell weui-cell_access" href="subordinatesInfo.html">
-      <div class="weui-cell__bd">
-        <p>胡靖</p>
-      </div>
-      <div class="weui-cell__ft">
-      </div>
-    </a>
+    <#list proxies as proxy>
+      <a class="weui-cell weui-cell_access" href="/subordinatesAdd/${proxy.id}">
+        <div class="weui-cell__bd">
+          <p>${proxy.displayName}</p>
+        </div>
+        <div class="weui-cell__ft">
+        </div>
+      </a>
+    </#list>
   </div>
   <div class='demos-content-padded'>
-    <a href="subordinatesAdd.html" class="weui-btn weui-btn_primary">申请下属账号</a></div>
+    <a href="subordinatesAdd" class="weui-btn weui-btn_primary">申请下属账号</a></div>
 
   <#include "footer.html" />
 

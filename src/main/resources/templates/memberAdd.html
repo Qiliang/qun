@@ -42,9 +42,31 @@
     <div class='demos-content-padded'>
         <input type="submit" value="保存" class="weui-btn weui-btn_primary"/>
     </div>
+    <#if (employee.id)??>
+        <div class='demos-content-padded'>
+            <input type="hidden" name="action"/>
+            <input id="delete" value="删除" type="button" class="weui-btn weui-btn_default"/>
+
+        </div>
+    </#if>
 </form>
 <#include "footer.html" />
+<script>
+    $('#delete').click(function () {
+        $.confirm({
+            title: '确认删除？',
+            onOK: function () {
+                $('input[name=action]').val('删除');
+                $('form').submit();
+            },
+            onCancel: function () {
 
+            }
+        });
+
+    })
+
+</script>
 </body>
 
 </html>

@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,8 +16,8 @@ import java.util.concurrent.Executors;
 
 @SpringBootApplication
 @EnableScheduling
+//public class QunApplication extends SpringBootServletInitializer {
 public class QunApplication  {
-
 	public static void main(String[] args) {
 		SpringApplication.run(QunApplication.class, args);
 	}
@@ -26,5 +28,9 @@ public class QunApplication  {
 	}
 
 
+//	@Override
+//	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+//		return application.sources(QunApplication.class);
+//	}
 
 }

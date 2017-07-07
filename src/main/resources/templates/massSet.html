@@ -39,7 +39,7 @@
     <div class="weui-cells weui-cells_form margintop">
         <div class="weui-cell">
             <div class="weui-cell__bd">
-                <textarea id="massText" class="weui-textarea" placeholder="请输入你要群发的文字信息" rows="3"></textarea>
+                <textarea id="massText" class="weui-textarea" placeholder="请输入你要群发的文字信息" rows="3">${(massSet.text)!}</textarea>
                 <div class="weui-textarea-counter"><span>0</span>/200</div>
             </div>
         </div>
@@ -91,9 +91,10 @@
         </div>
     </div>
     <div class='demos-content-padded'>
-        <input id="save" value="保存" type="button" class="weui-btn weui-btn_primary"/>
         <#if (massSet.id)??>
             <input id="delete" value="删除" name="actionType" type="button" class="weui-btn weui-btn_default"/>
+        <#else>
+            <input id="save" value="保存" type="button" class="weui-btn weui-btn_primary"/>
         </#if>
     </div>
 
@@ -131,19 +132,29 @@
 
 
     $('#delete').click(function () {
-        $('#loading').show();
-        $('.massContent').hide();
-        $.ajax({
-            url: '/massSet/' +'${(massSet.id)!}',
-            type: 'Delete',
-            cache: false
-        }).done(function (res) {
-            window.location.href = "/massList"
-        }).fail(function (res) {
-            console.log(res);
-            $('#loading').hide();
-            $('.massContent').show();
+        $.confirm({
+            title: '确认删除？',
+            onOK: function () {
+                $('#loading').show();
+                $('.massContent').hide();
+                $.ajax({
+                    url: '/massSet/' +'${(massSet.id)!}',
+                    type: 'Delete',
+                    cache: false
+                }).done(function (res) {
+                    window.location.href = "/massList"
+                }).fail(function (res) {
+                    console.log(res);
+                    $('#loading').hide();
+                    $('.massContent').show();
+                });
+            },
+            onCancel: function () {
+            }
         });
+
+
+
     });
 
 

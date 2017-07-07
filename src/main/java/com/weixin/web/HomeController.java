@@ -42,15 +42,15 @@ public class HomeController {
     }
 
 
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('EMPLOYEE')")
     @RequestMapping({"/", ""})
     public String adminIndex(HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
         User user = userRepository.findByUsername(username);
         m.addAttribute("user", user);
-        if (user.getRole().toString().equals(User.ROLE.EMPLOYEE.toString())) {
-            return setMessage(request, m);
-        }
+//        if (user.getRole().toString().equals(User.ROLE.EMPLOYEE.toString())) {
+//            return setMessage(request, m);
+//        }
         return "index";
     }
 
@@ -133,7 +133,7 @@ public class HomeController {
         return "setMessage";
     }
 
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('EMPLOYEE')")
     @GetMapping("/accountSet")
     public String accountSet(HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
@@ -142,18 +142,18 @@ public class HomeController {
         return "accountSet";
     }
 
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('EMPLOYEE')")
     @PostMapping("/accountSet")
     public String accountSetPost(User member, HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.getOne(member.getId());
         user.setUsername(member.getUsername());
         user.setDisplayName(member.getDisplayName());
         user.setPassword(member.getPassword());
         user.setTel(member.getTel());
         userRepository.save(user);
         m.addAttribute("user", user);
-        return "accountSet";
+        return "/";
     }
 
     @PreAuthorize("hasAuthority('USER')")
@@ -178,20 +178,28 @@ public class HomeController {
 
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping({"/memberAdd"})
-    public String memberAddPost(User member, HttpServletRequest request, Model m) {
+    public String memberAddPost(User member, @RequestParam(required = false) String action, HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
         User user = userRepository.findByUsername(username);
         m.addAttribute("user", user);
-        if (userRepository.findByUsername(member.getUsername()) == null) {
-            member.setEmployer(username);
-            member.setRole(User.ROLE.EMPLOYEE);
-            userRepository.save(member);
+        if ("删除".equals(action)) {
+            userRepository.delete(member.getId());
             m.addAttribute("employees", userRepository.findByEmployer(username));
             return "memberList";
+        } else {
+            if (member.getId() != null || userRepository.findByUsername(member.getUsername()) == null) {
+                member.setEmployer(username);
+                member.setRole(User.ROLE.EMPLOYEE);
+                userRepository.save(member);
+                m.addAttribute("employees", userRepository.findByEmployer(username));
+                return "memberList";
+            }
+            m.addAttribute("message", "登录账号重复");
+            m.addAttribute("employee", member);
+            return "memberAdd";
         }
-        m.addAttribute("message", "登录账号重复");
-        m.addAttribute("employee", member);
-        return "memberAdd";
+
+
 
     }
 
@@ -269,12 +277,43 @@ public class HomeController {
     }
 
     @PreAuthorize("hasAuthority('USER')")
-    @RequestMapping("/subordinates")
+    @GetMapping("/subordinates")
     public String subordinates(HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
         User user = userRepository.findByUsername(username);
         m.addAttribute("user", user);
+        m.addAttribute("proxies", userRepository.findByParent(username));
         return "subordinates";
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping({"/subordinatesAdd", "/subordinatesAdd/{id}"})
+    public String subordinatesAdd(@PathVariable(required = false) Integer id, HttpServletRequest request, Model m) {
+        String username = request.getUserPrincipal().getName();
+        User user = userRepository.findByUsername(username);
+        if (id != null) m.addAttribute("proxy", userRepository.findOne(id));
+        m.addAttribute("user", user);
+        return "subordinatesAdd";
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @PostMapping({"/subordinatesAdd"})
+    public String subordinatesAddPost(User member, HttpServletRequest request, Model m) {
+        String username = request.getUserPrincipal().getName();
+        User user = userRepository.findByUsername(username);
+        m.addAttribute("user", user);
+        if (member.getId() != null || userRepository.findByUsername(member.getUsername()) == null) {
+            member.setActive(false);
+            member.setRole(User.ROLE.USER);
+            member.setParent(username);
+            userRepository.save(member);
+            m.addAttribute("proxies", userRepository.findByParent(username));
+            return "subordinates";
+        }
+        m.addAttribute("message", "登录账号重复");
+        m.addAttribute("proxy", member);
+        return "subordinates";
+
     }
 
 

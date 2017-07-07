@@ -2,12 +2,17 @@
 <html lang="en">
 <head>
   <#include "header.html" />
+  <style>
+    #backHome {
+      display: none;
+    }
+  </style>
 </head>
 <body ontouchstart>
 
   <header class='header'>
     <div class="header-userAvatar"><img src="/img/avatar.jpeg" alt=""></div>
-    <div class="header-userName">胡駿（趣伴）</div>
+    <div class="header-userName">魔笛手群发</div>
   </header>
 
   <div class="title">常用功能</div>
@@ -21,7 +26,6 @@
           群发消息
         </p>
       </a>
-      <#if user.role=="USER">
       <a href="" class="weui-grid js_grid">
         <div class="weui-grid__icon">
           <img src="images/icon_nav_button.png" alt="">
@@ -30,8 +34,6 @@
           发送统计
         </p>
       </a>
-      </#if>
-      <#if user.role=="USER">
       <a href="accountSet" class="weui-grid js_grid">
         <div class="weui-grid__icon">
           <img src="images/icon_nav_button.png" alt="">
@@ -40,11 +42,12 @@
           账号设置
         </p>
       </a>
-      </#if>
+
     </div>
+  <#if user.role=="USER">
     <div class="title">基本设置</div>
     <div class="weui-grids gridsBackground">
-      <#if user.role=="USER">
+
       <a href="massList.html" class="weui-grid js_grid">
         <div class="weui-grid__icon">
           <img src="images/icon_nav_button.png" alt="">
@@ -53,8 +56,6 @@
           群发配置
         </p>
       </a>
-      </#if>
-      <#if user.role=="USER">
       <a href="memberList" class="weui-grid js_grid">
         <div class="weui-grid__icon">
           <img src="images/icon_nav_button.png" alt="">
@@ -63,8 +64,6 @@
           员工账号
         </p>
       </a>
-      </#if>
-      <#if user.role=="USER">
       <a href="subordinates" class="weui-grid js_grid">
         <div class="weui-grid__icon">
           <img src="images/icon_nav_button.png" alt="">
@@ -73,15 +72,17 @@
           下属账号
         </p>
       </a>
-      </#if>
+
     </div>
+  </#if>
     <div class="weui-footer bottom">
         <p class="weui-footer__links">
           <a href="javascript:void(0);" class="weui-footer__link">本服务由魔笛手科技有限公司提供技术支持</a>
         </p>
         <p class="weui-footer__text">Copyright © 2008-2016 remberme.io</p>
       </div>
-    <#include "footer.html" />
+
+  <#include "footer.html" />
 
 </body>
 

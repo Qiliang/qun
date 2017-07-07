@@ -29,6 +29,8 @@ public class User {
 
     private String parent;
 
+    private boolean active = true;
+
     public String getUsername() {
         return username;
     }
@@ -86,5 +88,13 @@ public class User {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
