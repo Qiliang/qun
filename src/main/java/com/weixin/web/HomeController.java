@@ -54,71 +54,6 @@ public class HomeController {
         return "index";
     }
 
-    @PreAuthorize("hasAuthority('USER')")
-    @RequestMapping("/admin-config")
-    public String adminConfig(HttpServletRequest request, Model m) {
-        String username = request.getUserPrincipal().getName();
-        User user = userRepository.findByUsername(username);
-        // user.setWxConfigs(wxConfigRepository.findByUsername(username));
-        m.addAttribute("user", user);
-        return "admin-config";
-    }
-
-    @PreAuthorize("hasAuthority('USER')")
-    @RequestMapping(value = "/admin-config", method = RequestMethod.POST)
-    public String saveAdminConfig(MultipartHttpServletRequest request, Model m) throws IOException {
-        String username = request.getUserPrincipal().getName();
-        MultipartFile img = request.getFile("img");
-        String txt = request.getParameter("txt");
-        String wxConfigId = request.getParameter("wxConfigId");
-        MassConfig wxConfig = wxConfigRepository.findOne(Integer.valueOf(wxConfigId));
-        if (!StringUtils.isEmpty(txt)) wxConfig.setText(txt);
-        if (img.getBytes() != null && img.getBytes().length > 0)
-            wxConfig.setImage(Base64.getEncoder().encodeToString(img.getBytes()));
-        wxConfigRepository.save(wxConfig);
-        User user = userRepository.findByUsername(username);
-        userRepository.save(user);
-        m.addAttribute("user", user);
-        return "admin-config";
-    }
-
-    @PreAuthorize("hasAuthority('USER')")
-    @RequestMapping("/admin-qrcode")
-    public String adminqrcode(HttpServletRequest request, Model m) {
-        String username = request.getUserPrincipal().getName();
-        User user = userRepository.findByUsername(username);
-        m.addAttribute("user", user);
-        return "admin-qrcode";
-    }
-
-    @PreAuthorize("hasAuthority('USER')")
-    @RequestMapping("/admin-help")
-    public String adminHelp(HttpServletRequest request, Model m) {
-        String username = request.getUserPrincipal().getName();
-        User user = userRepository.findByUsername(username);
-        m.addAttribute("user", user);
-        return "admin-help";
-    }
-
-
-    @PreAuthorize("hasAuthority('USER')")
-    @RequestMapping("/admin-stat")
-    public String adminstat(HttpServletRequest request, Model m) {
-        String username = request.getUserPrincipal().getName();
-        User user = userRepository.findByUsername(username);
-        m.addAttribute("user", user);
-        return "admin-stat";
-    }
-
-    @PreAuthorize("hasAuthority('USER')")
-    @RequestMapping("/admin-users")
-    public String adminusers(HttpServletRequest request, Model m) {
-        String username = request.getUserPrincipal().getName();
-        User user = userRepository.findByUsername(username);
-        m.addAttribute("user", user);
-        return "admin-users";
-    }
-
     @PreAuthorize("hasAuthority('USER') OR hasAuthority('EMPLOYEE')")
     @RequestMapping("/setMessage")
     public String setMessage(HttpServletRequest request, Model m) {
@@ -313,6 +248,31 @@ public class HomeController {
         m.addAttribute("message", "登录账号重复");
         m.addAttribute("proxy", member);
         return "subordinates";
+
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping({"/copyright"})
+    public String copyright(HttpServletRequest request, Model m) {
+        String username = request.getUserPrincipal().getName();
+        User user = userRepository.findByUsername(username);
+        m.addAttribute("user", user);
+        return "copyright";
+
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @PostMapping({"/copyright"})
+    public String copyrightPost(@RequestParam String copyright, HttpServletRequest request, Model m) {
+        String username = request.getUserPrincipal().getName();
+        User user = userRepository.findByUsername(username);
+        if (!StringUtils.isEmpty(copyright)) {
+            user.setCopyright(copyright);
+            userRepository.save(user);
+        }
+
+        m.addAttribute("user", user);
+        return "index";
 
     }
 

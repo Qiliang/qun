@@ -22,7 +22,21 @@
     <a href="/memberAdd" class="weui-btn weui-btn_primary">新增员工账号</a></div>
 
   <#include "footer.html" />
-
+  <script type="text/javascript">
+  $(function(){
+pushHistory();
+window.addEventListener("popstate", function(e) {
+window.location.href = "http://qunfa.qubanvip.cn"
+}, false);
+function pushHistory() {
+var state = {
+title: "title",
+url: "#"
+};
+window.history.pushState(state, "title", "#");
+}
+});
+  </script>
 </body>
 
 </html>

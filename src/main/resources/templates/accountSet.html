@@ -11,20 +11,19 @@
     <div class="weui-cells margintop">
       <input type="hidden" name="id" value="${(user.id)!}"/>
       <div class="weui-cell">
-        <div class="weui-cell__hd"><label class="weui-label">员工姓名</label></div>
+        <div class="weui-cell__hd"><label class="weui-label">姓名</label></div>
         <div class="weui-cell__bd">
-          <input class="weui-input" name="displayName" type="text" value="${(user.displayName)!}" placeholder="输入姓名">
+          <input class="weui-input" name="displayName" type="text" value="${(user.displayName)!}" placeholder="输入姓名" >
         </div>
       </div>
       <div class="weui-cell">
         <div class="weui-cell__hd"><label class="weui-label">登录账号</label></div>
         <div class="weui-cell__bd">
           <#if message??><span style="color:orangered">${message}</span></#if>
-          <#if user.role=="EMPLOYEE">
-            <input disabled class="weui-input" type="text" name="username" value="${(user.username)!}" placeholder="输入登录账号">
-          <#else>
-            <input class="weui-input" type="text" name="username" value="${(user.username)!}" placeholder="输入登录账号">
-          </#if>
+
+            <input  class="weui-input" type="text" name="username" value="${(user.username)!}" placeholder="输入登录账号" disabled>
+
+    
         </div>
       </div>
       <div class="weui-cell">

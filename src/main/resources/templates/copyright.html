@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <#include "header.html" />
+</head>
+
+<body ontouchstart>
+  <div class="title">版权配置</div>
+  <form method="post" action="/copyright">
+    <div class="weui-cells margintop">
+      <input type="hidden" name="id" value="${(user.id)!}"/>
+
+      <div class="weui-cell">
+        <div class="weui-cell__hd"><label class="weui-label">版权信息</label></div>
+        <div class="weui-cell__bd">
+          <input class="weui-input" name="copyright" type="text" value="${(user.copyright)!}" placeholder="输入版权信息">
+        </div>
+      </div>
+
+    </div>
+  <div class='demos-content-padded'>
+      <input type="submit" value="保存" class="weui-btn weui-btn_primary"/>
+  </div>
+  </form>
+
+  <#include "footer.html" />
+
+</body>
+
+</html>

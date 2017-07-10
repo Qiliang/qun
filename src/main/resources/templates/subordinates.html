@@ -24,5 +24,19 @@
   <#include "footer.html" />
 
 </body>
-
+<script type="text/javascript">
+$(function(){
+pushHistory();
+window.addEventListener("popstate", function(e) {
+window.location.href = "http://qunfa.qubanvip.cn"
+}, false);
+function pushHistory() {
+var state = {
+title: "title",
+url: "#"
+};
+window.history.pushState(state, "title", "#");
+}
+});
+</script>
 </html>

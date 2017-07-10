@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class User {
 
     public enum ROLE{
-        ADMIN, USER, PROXY, EMPLOYEE;
+        ADMIN, USER, EMPLOYEE;
     }
 
     @Enumerated(EnumType.STRING)
@@ -28,6 +28,8 @@ public class User {
     private String employer;
 
     private String parent;
+
+    private String copyright;
 
     private boolean active = true;
 
@@ -96,5 +98,13 @@ public class User {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getCopyright() {
+        return copyright;
+    }
+
+    public void setCopyright(String copyright) {
+        this.copyright = copyright;
     }
 }

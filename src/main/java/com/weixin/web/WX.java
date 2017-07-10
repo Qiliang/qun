@@ -2,9 +2,13 @@ package com.weixin.web;
 
 import com.weixin.domain.MassConfig;
 import com.weixin.domain.MassConfigRepository;
+import com.weixin.domain.User;
 import com.weixin.domain.UserRepository;
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -24,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -133,10 +136,24 @@ public class WX implements InitializingBean {
 //        return
     }
 
+    private String getCopyright(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user.getRole().toString().equals(User.ROLE.EMPLOYEE.toString())) {
+            return getCopyright(user.getEmployer());
+        } else if (user.getRole().toString().equals(User.ROLE.USER.toString())) {
+            if (StringUtils.isEmpty(user.getParent())) {
+                return user.getCopyright();
+            } else {
+                return getCopyright(user.getParent());
+            }
+        }
+        return "";
+    }
 
     @RequestMapping("/contact/{id}")
     @ResponseBody
     public String contact2(@PathVariable String id, @RequestBody MassConfig wxConfig, HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         PhantomJSDriver webDriver = drivers.get(id);
         executorService.execute(() -> contract(webDriver, wxConfig));
         return "accept";
@@ -145,8 +162,11 @@ public class WX implements InitializingBean {
     @RequestMapping("/contact/{id}/{wxConfigId}")
     @ResponseBody
     public String contact(@PathVariable String id, @PathVariable Integer wxConfigId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String username = request.getUserPrincipal().getName();
+        String copyright = getCopyright(username);
         PhantomJSDriver webDriver = drivers.get(id);
         final MassConfig wxConfig = wxConfigRepository.findOne(wxConfigId);
+        wxConfig.setText(wxConfig.getText() + "\r\n--" + copyright);
         executorService.execute(() -> contract(webDriver, wxConfig));
         return "accept";
     }
