@@ -1,0 +1,62 @@
+<#include "admin-header.html" />
+
+<div class="admin-content-body">
+    <div class="am-cf am-padding am-padding-bottom-0">
+        <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">员工帐号</strong>
+        </div>
+    </div>
+
+    <hr/>
+        <div class="am-g">
+            <div class="am-u-sm-12">
+                <div class="am-panel am-panel-default">
+                    <div class="am-panel-bd">
+                        <div class="am-g">
+                            <table class="am-table">
+                                <thead>
+                                <tr>
+                                    <th>用户名</th>
+                                    <th>显示名</th>
+                                    <th>电话</th>
+                                    <th>密码</th>
+                                    <th>上级</th>
+                                    <th>是否激活</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <#list users as u>
+                                    <tr>
+                                        <td>${u.username}</td>
+                                        <td>${u.displayName}</td>
+                                        <td>${u.tel}</td>
+                                        <td>${u.password}</td>
+                                        <td>${u.parent}</td>
+                                        <td>${u.active?string('是', '否')}</td>
+                                        <td>
+                                            <form action="/admin-users" method="post">
+                                                <input type="hidden" name="id" value="${u.id}" />
+
+                                                <#if u.active>
+                                                    <input type="submit" name="action" class="am-btn am-btn-danger" value="禁用">
+                                                <#else>
+                                                    <input type="submit" name="action" class="am-btn am-btn-warning" value="激活">
+                                                </#if>
+
+
+                                            </form>
+
+                                        </td>
+                                    </tr>
+                                </#list>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+<#include "admin-footer.html" />

@@ -21,6 +21,12 @@
             <input id="massTitle" class="weui-input" type="text" placeholder="群发名称" value="${(massSet.title)!}"/>
         </div>
     </div>
+    <div class="weui-cell weui-cell_switch">
+        <div class="weui-cell__bd">是否发到群聊</div>
+        <div class="weui-cell__ft">
+            <input class="weui-switch" id="qun" type="checkbox">
+        </div>
+    </div>
     <div class="weui-cell weui-cell_select weui-cell_select-after massContent">
         <div class="weui-cell__hd">
             <label class="weui-label">群发类型</label>
@@ -174,6 +180,7 @@
             formData.append('massTitle', $('#massTitle').val());
             formData.append('massText', $('#massText').val());
             formData.append('massType', $('#massType').val());
+            formData.append('qun', $('#qun').val());
             $('#loading').show();
             $('.massContent').hide();
             $.ajax({

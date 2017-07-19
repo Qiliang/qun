@@ -1,9 +1,6 @@
 package com.weixin.web;
 
-import com.weixin.domain.MassConfig;
-import com.weixin.domain.MassConfigRepository;
-import com.weixin.domain.User;
-import com.weixin.domain.UserRepository;
+import com.weixin.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -20,6 +17,10 @@ import java.util.Base64;
 @Controller
 public class HomeController {
 
+    @Autowired
+    SendHistoryRepository sendHistoryRepository;
+    @Autowired
+    SendHistoryDetailRepository sendHistoryDetailRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -42,15 +43,17 @@ public class HomeController {
     }
 
 
-    @PreAuthorize("hasAuthority('USER') OR hasAuthority('EMPLOYEE')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('EMPLOYEE') OR hasAuthority('ADMIN')")
     @RequestMapping({"/", ""})
     public String adminIndex(HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
         User user = userRepository.findByUsername(username);
         m.addAttribute("user", user);
-//        if (user.getRole().toString().equals(User.ROLE.EMPLOYEE.toString())) {
-//            return setMessage(request, m);
-//        }
+
+        if (user.getRole().toString().equals(User.ROLE.ADMIN.toString())) {
+            return "admin/admin-index";
+        }
+
         return "index";
     }
 
@@ -179,10 +182,12 @@ public class HomeController {
         String massText = request.getParameter("massText");
         String massTitle = request.getParameter("massTitle");
         String massType = request.getParameter("massType");
+        String qun = request.getParameter("qun");
         MassConfig massConfig = new MassConfig();
         if (!StringUtils.isEmpty(id)) {
             massConfig = wxConfigRepository.findOne(Integer.parseInt(id));
         }
+        massConfig.setQun("on".equals(qun));
         massConfig.setTitle(massTitle);
         massConfig.setUsername(username);
         massConfig.setType(massType);
@@ -273,6 +278,18 @@ public class HomeController {
 
         m.addAttribute("user", user);
         return "index";
+
+    }
+
+
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping({"/stat"})
+    public String stat(HttpServletRequest request, Model m) {
+        String username = request.getUserPrincipal().getName();
+        User user = userRepository.findByUsername(username);
+        m.addAttribute("user", user);
+        m.addAttribute("histories",sendHistoryRepository.findByUser(username));
+        return "stat";
 
     }
 

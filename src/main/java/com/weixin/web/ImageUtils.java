@@ -12,7 +12,7 @@ import java.io.*;
 /**
  * Created by xiaoq on 2017/6/29.
  */
-public class ImgaeUtils {
+public class ImageUtils {
 
 
     public static byte[] crop(byte[] input,  int x,int y, int w, int h, boolean isPNG) {

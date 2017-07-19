@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 //public class QunApplication extends SpringBootServletInitializer {
 public class QunApplication  {
 	public static void main(String[] args) {
+		System.setProperty("jsse.enableSNIExtension", "false");
 		SpringApplication.run(QunApplication.class, args);
 	}
 

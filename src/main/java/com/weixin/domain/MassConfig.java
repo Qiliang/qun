@@ -1,9 +1,6 @@
 package com.weixin.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.*;
 
 @Entity
 public class MassConfig {
@@ -16,12 +13,25 @@ public class MassConfig {
 
     private String username;
 
+    @Transient
+    private String operator;
+
     @Lob
     private String image;
     @Lob
-    private String text;
+    private String text = "".intern();
 
     private String type;
+
+    private boolean qun;
+
+    public boolean isQun() {
+        return qun;
+    }
+
+    public void setQun(boolean qun) {
+        this.qun = qun;
+    }
 
     public Integer getId() {
         return id;
@@ -69,5 +79,13 @@ public class MassConfig {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
     }
 }

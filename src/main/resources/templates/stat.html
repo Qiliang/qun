@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <#include "header.html" />
+</head>
+
+<body ontouchstart>
+<div class="title">发送统计</div>
+
+<div class="weui-cells margintop">
+    <#if (histories?size>0) >
+        <#list histories as history>
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <p>${history.operator}</p>
+                </div>
+                <div class="weui-cell__ft">
+                    <p>[${history.configName}]发送:${history.count}</p>
+                </div>
+            </div>
+        </#list>
+    <#else>
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <p>暂无统计</p>
+            </div>
+            <div class="weui-cell__ft">
+                <p></p>
+            </div>
+        </div>
+
+    </#if>
+</div>
+
+
+<#include "footer.html" />
+
+</body>
+
+</html>

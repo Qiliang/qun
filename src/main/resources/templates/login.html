@@ -3,6 +3,11 @@
 
 <head>
   <#include "header.html" />
+  <script>
+      if (!(navigator.userAgent.match(/(iPhone|iPod|Android|ios|iPad)/i))) {
+          window.location.href = "/admin-login";
+      }
+  </script>
   <style>
     #backHome {
       display: none;

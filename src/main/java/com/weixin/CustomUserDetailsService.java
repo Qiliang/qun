@@ -1,5 +1,6 @@
 package com.weixin;
 
+
 import com.weixin.domain.User;
 import com.weixin.domain.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
 
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
@@ -24,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
-        System.err.println("username is " + username + ", " + user.getRole().name());
+        System.out.println("username is " + username + ", " + user.getRole().name());
         return new org.springframework.security.core.userdetails.User(user.getUsername(),
                 user.getPassword(), authorities);
     }
