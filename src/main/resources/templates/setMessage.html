@@ -33,6 +33,11 @@
   </div>
   <#include "footer.html" />
   <script>
+      //weui-btn_disabled
+      if($('#massType option').length==0){
+          $('#qrGen').addClass("weui-btn_disabled")
+      }
+
       $(function () {
           var id = 0;
           function reset() {
@@ -78,6 +83,7 @@
           }, 1000);
 
           $('#qrGen').click(function () {
+              if($(this).hasClass("weui-btn_disabled"))return;
               qrGen();
               $('.qrGen').hide();
           });

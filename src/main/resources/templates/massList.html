@@ -32,8 +32,10 @@
       <!--</div>-->
     <!--</a>-->
   </div>
+  <#if user.role=="USER" || (massList?size==0) >
   <div class='demos-content-padded'>
     <a href="/massSet" class="weui-btn weui-btn_primary">新增群发信息</a></div>
+  </#if>
   <#include "footer.html" />
 
 </body>

@@ -20,18 +20,20 @@
                                     <th>电话</th>
                                     <th>密码</th>
                                     <th>上级</th>
+                                    <th>角色</th>
                                     <th>是否激活</th>
-                                    <th></th>
+                                    <th><a class="am-btn am-btn-primary" href="/admin-addUser" target="_self">添加用户</a></th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <#list users as u>
                                     <tr>
-                                        <td>${u.username}</td>
-                                        <td>${u.displayName}</td>
-                                        <td>${u.tel}</td>
-                                        <td>${u.password}</td>
-                                        <td>${u.parent}</td>
+                                        <td>${u.username!}</td>
+                                        <td>${u.displayName!}</td>
+                                        <td>${u.tel!}</td>
+                                        <td>${u.password!}</td>
+                                        <td>${(u.parent)!}</td>
+                                        <td><#if (u.role=='USER')>企业</#if><#if (u.role=='USER2')>个人</#if> <#if (u.role=='INIT')>未激活</#if></td>
                                         <td>${u.active?string('是', '否')}</td>
                                         <td>
                                             <form action="/admin-users" method="post">
@@ -40,9 +42,14 @@
                                                 <#if u.active>
                                                     <input type="submit" name="action" class="am-btn am-btn-danger" value="禁用">
                                                 <#else>
-                                                    <input type="submit" name="action" class="am-btn am-btn-warning" value="激活">
-                                                </#if>
+                                                    <#if (u.role=='INIT')>
+                                                        <input type="submit" name="action" class="am-btn am-btn-warning" value="激活为企业用户">
+                                                        <input type="submit" name="action" class="am-btn am-btn-warning" value="激活为个人用户">
+                                                     <#else>
+                                                            <input type="submit" name="action" class="am-btn am-btn-warning" value="启用">
+                                                    </#if>
 
+                                                </#if>
 
                                             </form>
 

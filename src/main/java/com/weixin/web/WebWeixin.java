@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.weixin.domain.MassConfig;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.HttpClientUtils;
@@ -73,7 +74,9 @@ public class WebWeixin {
     public String qrGen() throws IOException {
         //https://login.wx.qq.com/jslogin?appid=wx782c26e4c19acffb&redirect_uri=https%3A%2F%2Fwx.qq.com%2Fcgi-bin%2Fmmwebwx-bin%2Fwebwxnewloginpage&fun=new&lang=zh_CN&_=1500443229176
         String url = "https://login.wx.qq.com/jslogin?appid=wx782c26e4c19acffb&redirect_uri=https%3A%2F%2Fwx.qq.com%2Fcgi-bin%2Fmmwebwx-bin%2Fwebwxnewloginpage&fun=new&lang=zh_CN&_=" + tm13();
-        String responseText = EntityUtils.toString(httpClient.execute(new HttpGet(url)).getEntity(), "UTF-8");
+        CloseableHttpResponse response = httpClient.execute(new HttpGet(url));
+        String responseText = EntityUtils.toString(response.getEntity(), "UTF-8");
+        response.close();
         String qrLoginCode = getQRLoginCode(responseText);
         qrLoginUUID = getQRLoginUUID(responseText);
         System.out.println(qrLoginCode);
@@ -90,8 +93,9 @@ public class WebWeixin {
             String redirectUri = "unkonwn";
             do {
                 String url2 = String.format("https://login.weixin.qq.com/cgi-bin/mmwebwx-bin/login?tip=%s&uuid=%s&_=%s", tip, qrLoginUUID, new Date().getTime());
-                //String responseText2 = HttpsSSLClient.doGet(url2, "UTF-8");
-                String responseText2 = EntityUtils.toString(httpClient.execute(new HttpGet(url2)).getEntity(), "UTF-8");
+                CloseableHttpResponse response = httpClient.execute(new HttpGet(url2));
+                String responseText2 = EntityUtils.toString(response.getEntity(), "UTF-8");
+                response.close();
                 System.out.println(responseText2);
                 code = getWindowCode(responseText2);
                 if ("201".equals(code)) {
@@ -107,7 +111,9 @@ public class WebWeixin {
             } while (!code.equals("200"));
             System.out.println(redirectUri);
 
-            String responseText3 = EntityUtils.toString(httpClient.execute(new HttpGet(redirectUri + "&fun=new")).getEntity(), "UTF-8");
+            CloseableHttpResponse response = httpClient.execute(new HttpGet(redirectUri + "&fun=new"));
+            String responseText3 = EntityUtils.toString(response.getEntity(), "UTF-8");
+            response.close();
             //String responseText3 = HttpsSSLClient.doGet(redirectUri + "&fun=new", "UTF-8");
             Document document = Jsoup.parse(responseText3);
             skey = document.select("skey").text();
@@ -136,7 +142,9 @@ public class WebWeixin {
         post.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
         post.setEntity(new StringEntity(String.format("{\"BaseRequest\":%s}", baseRequest())));
 
-        String s = EntityUtils.toString(httpClient.execute(post).getEntity(), "utf-8");
+        CloseableHttpResponse response = httpClient.execute(post);
+        String s = EntityUtils.toString(response.getEntity(), "utf-8");
+        response.close();
         Map<String, Object> wxInits = objectMapper.readValue(s, Map.class);
         user = (Map<String, Object>) wxInits.get("User");
         userContactList = (List<Map<String, Object>>) wxInits.get("ContactList");
@@ -156,11 +164,13 @@ public class WebWeixin {
         post.addHeader("Accept-Language", "zh-CN,zh;q=0.8,de;q=0.6");
         post.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
         post.setEntity(new StringEntity("{}"));
-        String s = EntityUtils.toString(httpClient.execute(post).getEntity(), "utf-8");
+        CloseableHttpResponse response = httpClient.execute(post);
+        String s = EntityUtils.toString(response.getEntity(), "utf-8");
+        response.close();
         //System.out.println(s);
         contracts = objectMapper.readValue(s, Map.class);
         List<Map<String, Object>> memberList = (List<Map<String, Object>>) contracts.get("MemberList");
-        memberList = memberList.stream().filter(m -> userContactList.stream().anyMatch(u -> u.get("UserName").equals(m.get("UserName")))).collect(Collectors.toList());
+        memberList = memberList.stream().filter(m -> !userContactList.stream().anyMatch(u -> u.get("UserName").equals(m.get("UserName")))).collect(Collectors.toList());
         memberList.addAll(userContactList);
         List<Map<String, Object>> friends = memberList.stream().filter(m -> ((int) m.get("VerifyFlag")) == 0 && m.get("UserName").toString().startsWith("@")).collect(Collectors.toList());
         //List<String> friendNames = friends.stream().map(m -> (String) m.get("UserName")).collect(Collectors.toList());
@@ -181,7 +191,9 @@ public class WebWeixin {
         post.addHeader("Accept-Language", "zh-CN,zh;q=0.8,de;q=0.6");
         post.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
         post.setEntity(new StringEntity(String.format("sid=%s&uin=%s", wxsid, wxuin)));
-        EntityUtils.consume(httpClient.execute(post).getEntity());
+        CloseableHttpResponse response = httpClient.execute(post);
+        EntityUtils.consume(response.getEntity());
+        response.close();
     }
 
 
@@ -202,7 +214,7 @@ public class WebWeixin {
             if (!wxConfig.isQun() && friend.get("UserName").toString().startsWith("@@")) return;
             sendImage(upload, friend);
             toDB.accept(friend);
-            sleep(8000);
+            sleep(6000);
 
         });
     }
@@ -214,7 +226,7 @@ public class WebWeixin {
             sendImage(upload, friend);
             sendText(wxConfig, friend);
             toDB.accept(friend);
-            sleep(8000);
+            sleep(6000);
 
         });
     }
@@ -234,10 +246,14 @@ public class WebWeixin {
         post.addHeader("Accept-Language", "zh-CN,zh;q=0.8,de;q=0.6");
         post.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
         post.setEntity(new StringEntity(body, "utf-8"));
+        CloseableHttpResponse response = null;
         try {
-            String s = EntityUtils.toString(httpClient.execute(post).getEntity(), "utf-8");
+            response = httpClient.execute(post);
+            String s = EntityUtils.toString(response.getEntity(), "utf-8");
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            HttpClientUtils.closeQuietly(response);
         }
     }
 
@@ -257,8 +273,10 @@ public class WebWeixin {
         post.addHeader("Accept-Language", "zh-CN,zh;q=0.8,de;q=0.6");
         post.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
         post.setEntity(new StringEntity(body, "utf-8"));
+        CloseableHttpResponse response1 = null;
         try {
-            String s = EntityUtils.toString(httpClient.execute(post).getEntity(), "utf-8");
+            response1 = httpClient.execute(post);
+            String s = EntityUtils.toString(response1.getEntity(), "utf-8");
             Map<String, Object> response = objectMapper.readValue(s, Map.class);
             Map<String, Object> baseResponse = (Map<String, Object>) response.get("BaseResponse");
             if (((int) baseResponse.get("Ret")) == 1205) {
@@ -266,16 +284,17 @@ public class WebWeixin {
             } else {
                 System.out.println(new Date() + ":图片发送成功");
             }
-            System.out.println(s);
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            HttpClientUtils.closeQuietly(response1);
         }
     }
 
     public Map<String, Object> uploadImage(MassConfig wxConfig) throws IOException {
         String url = "https://file." + host + "/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json";
         HttpPost post = new HttpPost(url);
-        byte[] img = Base64.getUrlDecoder().decode(wxConfig.getImage());
+        byte[] img = Base64.getDecoder().decode(wxConfig.getImage());
         //File img = new File("C:\\Users\\XQL\\Pictures\\weixin\\logo.png");
         //{"UploadType":2,"BaseRequest":{"Uin":257904755,"Sid":"3R6kAV7dVW+SsZwY","Skey":"@crypt_6e9c4eaa_24e69c4bee5cd3d37a1c7c393b6975da","DeviceID":"e392294948459375"},"ClientMediaId":1500434590213,"TotalLen":2991,"StartPos":0,"DataLen":2991,"MediaType":4,"FromUserName":"@7e8d672b913fd9e0cc562a68d081e0d6","ToUserName":"filehelper","FileMd5":"a6ee1f3a3468cb46c61a5ebc9b4f05e2"}
         String md5 = md5(img);
@@ -294,8 +313,9 @@ public class WebWeixin {
                 .addPart("pass_ticket", new StringBody(pass_ticket, ContentType.DEFAULT_TEXT))
                 .addBinaryBody("filename", img, ContentType.APPLICATION_OCTET_STREAM, fileName).build();
         post.setEntity(entity);
-        String s = EntityUtils.toString(httpClient.execute(post).getEntity(), "utf-8");
-
+        CloseableHttpResponse  response = httpClient.execute(post);
+        String s = EntityUtils.toString(response.getEntity(), "utf-8");
+        response.close();
         //System.out.println(s);
         //map.get("MediaId")
         return objectMapper.readValue(s, Map.class);

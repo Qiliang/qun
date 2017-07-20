@@ -1,0 +1,58 @@
+<#include "admin-header.html" />
+
+<div class="admin-content-body">
+    <div class="am-cf am-padding am-padding-bottom-0">
+        <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">系统配置</strong>
+        </div>
+    </div>
+
+    <hr/>
+
+    <div class="am-g">
+        <div class="am-u-sm-24">
+            <input type="hidden" name="id" value="0" />
+            <form class="am-form am-form-horizontal" action="/admin-config" method="post">
+                <div class="am-form-group">
+                    <label for="textInterval" class="am-u-sm-3 am-form-label">姓名</label>
+                    <div class="am-u-sm-9">
+                        <input type="number" name="textInterval" value="${(config.textInterval)!}" id="textInterval" placeholder="文本发送间隔时间(毫秒)">
+                    </div>
+                </div>
+
+                <div class="am-form-group">
+                    <label for="username" class="am-u-sm-3 am-form-label">登录账号</label>
+                    <div class="am-u-sm-9">
+                        <input type="text" name="username" value="${(member.username)!}" id="username" placeholder="图片发送间隔时间(毫秒)">
+                    </div>
+                    <small class="am-u-sm-3" style="color:red">
+                        ${error!}
+                    </small>
+                </div>
+
+                <div class="am-form-group">
+                    <label for="password" class="am-u-sm-3 am-form-label">登录密码</label>
+                    <div class="am-u-sm-9">
+                        <input type="text" name="password" value="${(member.password)!}" id="password" placeholder="图文发送间隔时间(毫秒)">
+                    </div>
+                </div>
+
+                <div class="am-form-group">
+                    <label for="tel" class="am-u-sm-3 am-form-label">联系电话</label>
+                    <div class="am-u-sm-9">
+                        <input type="tel" name="tel" id="tel" value="${(member.tel)!}" placeholder="输入联系电话">
+                    </div>
+                </div>
+
+                <div class="am-form-group">
+                    <div class="am-u-sm-9 am-u-sm-push-3">
+                        <input type="submit" class="am-btn am-btn-primary" value="保存修改">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+</div>
+
+<#include "admin-footer.html" />

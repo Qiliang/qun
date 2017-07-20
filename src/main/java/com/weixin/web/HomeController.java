@@ -17,6 +17,8 @@ import java.util.Base64;
 @Controller
 public class HomeController {
 
+    public static final String COPYRIGHT="真世好“码扫全城”系统代发！";
+
     @Autowired
     SendHistoryRepository sendHistoryRepository;
     @Autowired
@@ -43,7 +45,7 @@ public class HomeController {
     }
 
 
-    @PreAuthorize("hasAuthority('USER') OR hasAuthority('EMPLOYEE') OR hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2') OR hasAuthority('EMPLOYEE') OR hasAuthority('ADMIN')")
     @RequestMapping({"/", ""})
     public String adminIndex(HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
@@ -57,7 +59,7 @@ public class HomeController {
         return "index";
     }
 
-    @PreAuthorize("hasAuthority('USER') OR hasAuthority('EMPLOYEE')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2') OR hasAuthority('EMPLOYEE')")
     @RequestMapping("/setMessage")
     public String setMessage(HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
@@ -71,7 +73,7 @@ public class HomeController {
         return "setMessage";
     }
 
-    @PreAuthorize("hasAuthority('USER') OR hasAuthority('EMPLOYEE')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2') OR hasAuthority('EMPLOYEE')")
     @GetMapping("/accountSet")
     public String accountSet(HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
@@ -80,12 +82,12 @@ public class HomeController {
         return "accountSet";
     }
 
-    @PreAuthorize("hasAuthority('USER') OR hasAuthority('EMPLOYEE')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2') OR hasAuthority('EMPLOYEE')")
     @PostMapping("/accountSet")
     public String accountSetPost(User member, HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
         User user = userRepository.getOne(member.getId());
-        user.setUsername(member.getUsername());
+        //user.setUsername(member.getUsername());
         user.setDisplayName(member.getDisplayName());
         user.setPassword(member.getPassword());
         user.setTel(member.getTel());
@@ -141,7 +143,7 @@ public class HomeController {
 
     }
 
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2')")
     @RequestMapping("/massList")
     public String massList(HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
@@ -151,7 +153,7 @@ public class HomeController {
         return "massList";
     }
 
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2')")
     @GetMapping({"/massSet/{massSetId}", "/massSet"})
     public String massSet(@PathVariable(required = false) Integer massSetId, HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
@@ -162,7 +164,7 @@ public class HomeController {
         return "massSet";
     }
 
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2')")
     @DeleteMapping({"/massSet/{massSetId}"})
     public String massSetDelete(@PathVariable Integer massSetId, HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
@@ -173,7 +175,7 @@ public class HomeController {
         return "massList";
     }
 
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2')")
     @PostMapping("/massSet")
     public String massSetPost(MultipartHttpServletRequest request, Model m) throws IOException {
         String username = request.getUserPrincipal().getName();
@@ -187,7 +189,7 @@ public class HomeController {
         if (!StringUtils.isEmpty(id)) {
             massConfig = wxConfigRepository.findOne(Integer.parseInt(id));
         }
-        massConfig.setQun("on".equals(qun));
+        massConfig.setQun("true".equals(qun));
         massConfig.setTitle(massTitle);
         massConfig.setUsername(username);
         massConfig.setType(massType);
@@ -195,19 +197,17 @@ public class HomeController {
             massConfig.setText(massText);
             massConfig.setImage(null);
         } else if ("2".equals(massType)) {
-            massConfig.setText(null);
-            StringBuffer s = new StringBuffer();
-            for (MultipartFile file : request.getFiles("file")) {
-                s.append(Base64.getEncoder().encodeToString(file.getBytes())).append("\t");
-            }
-            massConfig.setImage(s.toString());
+            massConfig.setText("");
+            MultipartFile file = request.getFile("file");
+            if(file!=null)massConfig.setImage(Base64.getEncoder().encodeToString(file.getBytes()));
+            if(id==null && file==null)
+                throw new RuntimeException("file is null");
         } else if ("3".equals(massType)) {
             massConfig.setText(massText);
-            StringBuffer s = new StringBuffer();
-            for (MultipartFile file : request.getFiles("file")) {
-                s.append(Base64.getEncoder().encodeToString(file.getBytes())).append("\t");
-            }
-            massConfig.setImage(s.toString());
+            MultipartFile file = request.getFile("file");
+            if(file!=null)massConfig.setImage(Base64.getEncoder().encodeToString(file.getBytes()));
+            if(id==null && file==null)
+                throw new RuntimeException("file is null");
         }
         wxConfigRepository.save(massConfig);
         User user = userRepository.findByUsername(username);
@@ -244,8 +244,9 @@ public class HomeController {
         m.addAttribute("user", user);
         if (member.getId() != null || userRepository.findByUsername(member.getUsername()) == null) {
             member.setActive(false);
-            member.setRole(User.ROLE.USER);
+            member.setRole(User.ROLE.INIT);
             member.setParent(username);
+            member.setCopyright(COPYRIGHT);
             userRepository.save(member);
             m.addAttribute("proxies", userRepository.findByParent(username));
             return "subordinates";
@@ -282,13 +283,18 @@ public class HomeController {
     }
 
 
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2') OR hasAuthority('EMPLOYEE')")
     @GetMapping({"/stat"})
     public String stat(HttpServletRequest request, Model m) {
         String username = request.getUserPrincipal().getName();
         User user = userRepository.findByUsername(username);
         m.addAttribute("user", user);
-        m.addAttribute("histories",sendHistoryRepository.findByUser(username));
+        if(user.getRole().toString().equals(User.ROLE.USER.toString()) || user.getRole().toString().equals(User.ROLE.USER2.toString())){
+            m.addAttribute("histories",sendHistoryRepository.findByUser(username));
+        }else if(user.getRole().toString().equals(User.ROLE.EMPLOYEE.toString())){
+            m.addAttribute("histories",sendHistoryRepository.findByOperator(username));
+        }
+
         return "stat";
 
     }

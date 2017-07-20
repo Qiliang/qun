@@ -44,10 +44,10 @@
       </a>
 
     </div>
-  <#if user.role=="USER">
+  <#if user.role=="USER" || user.role=="USER2">
     <div class="title">基本设置</div>
     <div class="weui-grids gridsBackground">
-
+      <#if user.role=="USER" || user.role=="USER2">
       <a href="massList" class="weui-grid js_grid">
         <div class="weui-grid__icon">
           <img src="images/icon_nav_button.png" alt="">
@@ -56,6 +56,8 @@
           群发配置
         </p>
       </a>
+      </#if>
+      <#if user.role=="USER">
       <a href="memberList" class="weui-grid js_grid">
         <div class="weui-grid__icon">
           <img src="images/icon_nav_button.png" alt="">
@@ -64,6 +66,8 @@
           员工账号
         </p>
       </a>
+      </#if>
+      <#if user.role=="USER">
       <a href="subordinates" class="weui-grid js_grid">
         <div class="weui-grid__icon">
           <img src="images/icon_nav_button.png" alt="">
@@ -72,8 +76,9 @@
           下属账号
         </p>
       </a>
-
+      </#if>
     </div>
+    <#if user.role=="USER">
     <div class="weui-grids gridsBackground">
 
       <a href="copyright" class="weui-grid js_grid">
@@ -86,6 +91,7 @@
       </a>
 
     </div>
+    </#if>
   </#if>
     <div class="weui-footer bottom">
         <p class="weui-footer__links">

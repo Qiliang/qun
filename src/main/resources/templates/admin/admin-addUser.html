@@ -1,0 +1,58 @@
+<#include "admin-header.html" />
+
+<div class="admin-content-body">
+    <div class="am-cf am-padding am-padding-bottom-0">
+        <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">员工帐号</strong>
+        </div>
+    </div>
+
+    <hr/>
+
+    <div class="am-g">
+        <div class="am-u-sm-24">
+
+            <form class="am-form am-form-horizontal" action="/admin-addUser" method="post">
+                <div class="am-form-group">
+                    <label for="displayName" class="am-u-sm-3 am-form-label">姓名</label>
+                    <div class="am-u-sm-9">
+                        <input type="text" name="displayName" value="${(member.displayName)!}" id="displayName" placeholder="姓名">
+                    </div>
+                </div>
+
+                <div class="am-form-group">
+                    <label for="username" class="am-u-sm-3 am-form-label">登录账号</label>
+                    <div class="am-u-sm-9">
+                        <input type="text" name="username" value="${(member.username)!}" id="username" placeholder="输入登录账号">
+                    </div>
+                    <small class="am-u-sm-3" style="color:red">
+                        ${error!}
+                    </small>
+                </div>
+
+                <div class="am-form-group">
+                    <label for="password" class="am-u-sm-3 am-form-label">登录密码</label>
+                    <div class="am-u-sm-9">
+                        <input type="text" name="password" value="${(member.password)!}" id="password" placeholder="输入登录密码">
+                    </div>
+                </div>
+
+                <div class="am-form-group">
+                    <label for="tel" class="am-u-sm-3 am-form-label">联系电话</label>
+                    <div class="am-u-sm-9">
+                        <input type="tel" name="tel" id="tel" value="${(member.tel)!}" placeholder="输入联系电话">
+                    </div>
+                </div>
+
+                <div class="am-form-group">
+                    <div class="am-u-sm-9 am-u-sm-push-3">
+                        <input type="submit" class="am-btn am-btn-primary" value="保存修改">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+</div>
+
+<#include "admin-footer.html" />

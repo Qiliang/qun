@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -107,11 +108,10 @@ public class WX2 implements InitializingBean {
     }
 
     private void contract(String id, MassConfig wxConfig) {
+        WebWeixin wx = drivers.get(id);
+        SendHistory sendHistory = new SendHistory();
         try {
-            WebWeixin wx = drivers.get(id);
             wx.initUser();
-
-            SendHistory sendHistory = new SendHistory();
             sendHistory.setConfigName(wxConfig.getTitle());
             sendHistory.setUser(wxConfig.getUsername());
             sendHistory.setOperator(wxConfig.getOperator());
@@ -134,9 +134,12 @@ public class WX2 implements InitializingBean {
                 });
             }
             sendHistoryRepository.save(sendHistory);
-
+            wx.logout();
+            wx.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            sendHistoryRepository.save(sendHistory);
         }
     }
 
@@ -150,6 +153,17 @@ public class WX2 implements InitializingBean {
         sendHistoryDetail.setHistoryId(sendHistory.getId());
         sendHistoryDetailRepository.save(sendHistoryDetail);
         sendHistory.setCount(sendHistory.getCount() + 1);
+    }
+
+    @Scheduled(fixedRate = 5000)
+    public void reportCurrentTime() {
+        for (String key : drivers.keySet()) {
+            long timestamp = Long.valueOf(key);
+            if (System.currentTimeMillis() - timestamp > 1000 * 60 * 10) {
+                drivers.get(key).close();
+                drivers.remove(key);
+            }
+        }
     }
 
 

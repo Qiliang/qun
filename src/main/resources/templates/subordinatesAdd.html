@@ -8,7 +8,7 @@
 <body ontouchstart>
   <div class="title">下属账号信息</div>
   <form method="post" action="/subordinatesAdd">
-  <div class="weui-cells margintop">
+  <div class="weui-cells margintop" disabled="true">
     <input type="hidden" name="id" value="${(proxy.id)!}"/>
     <div class="weui-cell">
       <div class="weui-cell__hd"><label class="weui-label">姓名</label></div>
@@ -36,9 +36,13 @@
       </div>
     </div>
   </div>
-  <div class="title" style="font-size:13px;">注意：此处申请的账号均为未激活状态，激活账号请联系平台方</div>
+
+  <#if (proxy.id)??>
+    <a href="javascript:;" class="weui-btn weui-btn_plain-default">${proxy.active?string('已激活','未激活')}</a>
+  </#if>
   <#if !(proxy.id)??>
   <div class='demos-content-padded'>
+    <div class="title" style="font-size:13px;">注意：此处申请的账号均为未激活状态，激活账号请联系平台方</div>
       <input type="submit" value="立即申请" class="weui-btn weui-btn_primary"/>
   </div>
   </#if>

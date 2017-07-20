@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class User {
 
     public enum ROLE{
-        ADMIN, USER, EMPLOYEE;
+        ADMIN, USER, USER2, EMPLOYEE,INIT;
     }
 
     @Enumerated(EnumType.STRING)
