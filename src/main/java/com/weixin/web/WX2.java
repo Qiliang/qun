@@ -6,6 +6,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +41,6 @@ public class WX2 implements InitializingBean {
     @Autowired
     MassConfigRepository wxConfigRepository;
 
-
     private Map<String, WebWeixin> drivers = new ConcurrentHashMap<>();
 
     @Value("${test}")
@@ -53,7 +53,7 @@ public class WX2 implements InitializingBean {
 
     }
 
-
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2') OR hasAuthority('EMPLOYEE')")
     @RequestMapping("/qr")
     @ResponseBody
     public Map<String, Object> qr(HttpServletResponse response) throws IOException, URISyntaxException {
@@ -69,6 +69,7 @@ public class WX2 implements InitializingBean {
     }
 
 
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2') OR hasAuthority('EMPLOYEE')")
     @RequestMapping("/state/{id}")
     @ResponseBody
     public String state(@PathVariable String id, HttpServletResponse response) throws IOException {
@@ -81,15 +82,14 @@ public class WX2 implements InitializingBean {
         if (user.getRole().toString().equals(User.ROLE.EMPLOYEE.toString())) {
             return getCopyright(user.getEmployer());
         } else if (user.getRole().toString().equals(User.ROLE.USER.toString())) {
-            if (StringUtils.isBlank(user.getParent())) {
-                return user.getCopyright();
-            } else {
-                return getCopyright(user.getParent());
-            }
+            return StringUtils.isBlank(user.getCopyright()) ? HomeController.COPYRIGHT : user.getCopyright();
+        } else if (user.getRole().toString().equals(User.ROLE.USER2.toString())) {
+            return StringUtils.isBlank(user.getParent()) ? HomeController.COPYRIGHT : getCopyright(user.getParent());
         }
-        return "";
+        return HomeController.COPYRIGHT;
     }
 
+    @PreAuthorize("hasAuthority('USER') OR hasAuthority('USER2') OR hasAuthority('EMPLOYEE')")
     @RequestMapping("/contact/{id}/{wxConfigId}")
     @ResponseBody
     public String contact(@PathVariable String id, @PathVariable Integer wxConfigId, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -159,7 +159,7 @@ public class WX2 implements InitializingBean {
     public void reportCurrentTime() {
         for (String key : drivers.keySet()) {
             long timestamp = Long.valueOf(key);
-            if (System.currentTimeMillis() - timestamp > 1000 * 60 * 10) {
+            if ((System.currentTimeMillis() - timestamp) / 1000 > 3600) {
                 drivers.get(key).close();
                 drivers.remove(key);
             }
