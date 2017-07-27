@@ -161,7 +161,7 @@ public class WebWeixin {
             if (!wxConfig.isQun() && friend.get("UserName").toString().startsWith("@@")) return;
             sendText(wxConfig, friend);
             toDB.accept(friend);
-            sleep(500);
+            sleep(2500);
         });
     }
 

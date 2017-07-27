@@ -74,6 +74,7 @@ public class WX2 implements InitializingBean {
     @ResponseBody
     public String state(@PathVariable String id, HttpServletResponse response) throws IOException {
         WebWeixin wx = drivers.get(id);
+        if(wx==null)return "none";
         return wx.isScan() ? "block" : "none";
     }
 
