@@ -199,10 +199,12 @@ public class WebWeixin {
         if (!friend.get("UserName").toString().startsWith("@@")) {
             text = String.format("%s,%s", friend.get("NickName"), text);
         }
+        text = text.replace("\"", "\\\"");
         String body = String.format("{\"BaseRequest\":%s,\"Msg\":{\"Type\":1,\"Content\":\"%s\",\"FromUserName\":\"%s\",\"ToUserName\":\"%s\",\"LocalID\":\"%s\",\"ClientMsgId\":\"%s\"},\"Scene\":0}",
                 baseRequest(), text, user.get("UserName"), friend.get("UserName"), msgId, msgId);
         try {
             String s = simpleClient.postJson(url, new StringEntity(body, "utf-8"));
+            //System.out.println(s);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

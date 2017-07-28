@@ -180,7 +180,7 @@ public class HomeController {
     public String massSetPost(MultipartHttpServletRequest request, Model m) throws IOException {
         String username = request.getUserPrincipal().getName();
 
-        String id = request.getParameter("id");
+        String id = request.getParameter("massId");
         String massText = request.getParameter("massText");
         String massTitle = request.getParameter("massTitle");
         String massType = request.getParameter("massType");

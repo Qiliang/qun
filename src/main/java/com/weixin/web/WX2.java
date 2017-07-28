@@ -160,7 +160,7 @@ public class WX2 implements InitializingBean {
     public void reportCurrentTime() {
         for (String key : drivers.keySet()) {
             long timestamp = Long.valueOf(key);
-            if ((System.currentTimeMillis() - timestamp) / 1000 > 3600) {
+            if ((System.currentTimeMillis() - timestamp) / 1000 > 3600 * 5) {
                 drivers.get(key).close();
                 drivers.remove(key);
             }
