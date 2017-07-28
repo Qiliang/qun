@@ -253,7 +253,7 @@ public class HomeController {
         }
         m.addAttribute("message", "登录账号重复");
         m.addAttribute("proxy", member);
-        return "subordinates";
+        return "subordinatesAdd";
 
     }
 

@@ -4,6 +4,7 @@ package com.weixin.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.weixin.domain.MassConfig;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -69,6 +70,9 @@ public class WebWeixin {
         String url = "https://login.wx.qq.com/jslogin?appid=wx782c26e4c19acffb&redirect_uri=https%3A%2F%2Fwx.qq.com%2Fcgi-bin%2Fmmwebwx-bin%2Fwebwxnewloginpage&fun=new&lang=zh_CN&_=" + tm13();
         String responseText = simpleClient.get(url);
         String qrLoginCode = getQRLoginCode(responseText);
+        if (StringUtils.isBlank(qrLoginCode)) {
+            return "".intern();
+        }
         qrLoginUUID = getQRLoginUUID(responseText);
         System.out.println(qrLoginCode);
         System.out.println(qrLoginUUID);
@@ -282,10 +286,15 @@ public class WebWeixin {
     }
 
     private String getWindowCode(String s) {
-        Pattern p = Pattern.compile("window.code=([\\d]+)?;");
-        Matcher matcher = p.matcher(s);
-        matcher.find();
-        return matcher.group(1);
+        try {
+            Pattern p = Pattern.compile("window.code=([\\d]+)?;");
+            Matcher matcher = p.matcher(s);
+            matcher.find();
+            return matcher.group(1);
+        } catch (Exception e) {
+            return "".intern();
+        }
+
 
     }
 
