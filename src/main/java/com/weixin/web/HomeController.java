@@ -136,7 +136,7 @@ public class HomeController {
             }
             m.addAttribute("message", "登录账号重复");
             m.addAttribute("employee", member);
-            return "memberAdd";
+            return "memberAdd";//测试
         }
 
 
